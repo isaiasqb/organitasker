@@ -4,12 +4,12 @@
 
 :root {
   --primary: #e56b6f;
-  --secondary: #6d597a;
-  --secondary: #277DA1;
+  /* --secondary: #6d597a; */
+  --secondary1: #277DA1;
   --secondary: #073b4c;
   --tertiary: rgb(234, 226, 183);
-  --grey: rgb(249, 65, 68);
-  --grey: #577590;
+  /* --grey: rgb(249, 65, 68); */
+  /* --grey: #577590; */
   --grey: #355070;
   font-size: 62.5%;
 }
@@ -131,7 +131,7 @@ footer {
 }
 
 .task-type {
-  color: var(--secondary);
+  color: var(--secondary1);
   font-size: 1.55rem;
 }
 .task-actions {
