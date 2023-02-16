@@ -1,3 +1,4 @@
+var pageContentEl = document.querySelector("#page-content");
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector('#tasks-to-do');
 // start a variable that holds a unique id number for each task
@@ -103,3 +104,30 @@ var createTaskActions = function(taskId) {
 }
 
 formEl.addEventListener('submit', taskFormHandler);
+
+
+//function to get the individual ID form the button clicked
+var taskButtonHandler = function(event){
+  //lets you know which element that was clicked, triggered the event 
+  console.log(event.target);
+  if (event.target.matches(".delete-btn")) {
+
+    var taskId = event.target.getAttribute("data-task-id");
+    console.log(`You have clicked a button on task #${taskId}`);
+    deleteTask(taskId);
+
+  } 
+  // else if (event.target.matches(".edit-btn")) {
+  //   console.log('You clicked an Edit button!')
+  // }
+}
+
+//function to delete a task that takes taskId parameter form taskButtonHandler()
+var deleteTask = function(taskId) {
+  console.log(`taskButtonHandler() >> passed  deleteTask() the ID ${taskId}`);
+
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  taskSelected.remove();
+}
+
+pageContentEl.addEventListener('click', taskButtonHandler)
