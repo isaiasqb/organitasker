@@ -21,12 +21,22 @@ var taskFormHandler = function(event){
 
   formEl.reset();
 
-  var taskDataObj = {
-    name: taskNameInput,
-    type: taskTypeInput
-  };
+  //if data-task-id attribute has been added ot the form, it means you are editing a task
+  var isEdit = formEl.hasAttribute("data-task-id");
+  console.log(`editing a task? - ${isEdit}`)
 
-  createTaskEl(taskDataObj)
+  if (isEdit) {
+    var taskId = formEl.getAttribute("data-task-id");
+    completeTaskEdit(taskNameInput, taskTypeInput, taskId);
+  } 
+  else {
+    var taskDataObj = {
+      name: taskNameInput,
+      type: taskTypeInput
+    };
+
+    createTaskEl(taskDataObj)
+  }
 };
 
 
@@ -108,26 +118,71 @@ formEl.addEventListener('submit', taskFormHandler);
 
 //function to get the individual ID form the button clicked
 var taskButtonHandler = function(event){
-  //lets you know which element that was clicked, triggered the event 
+  //which element was clicked and triggered the event?
   console.log(event.target);
-  if (event.target.matches(".delete-btn")) {
 
+  var targetEL = event.target;
+
+  // EDIT button is clicked
+  if (targetEL.matches(".edit-btn")) {
+    var taskId = targetEL.getAttribute("data-task-id");
+    console.log(`taskButtonHandler(): EDIT BUTTON Task #${taskId}`);
+    //pass the ID to the editTask() function
+    editTask(taskId);
+  }
+  //DELETE button is clicked
+  else if (targetEL.matches(".delete-btn")) {
     var taskId = event.target.getAttribute("data-task-id");
-    console.log(`You have clicked a button on task #${taskId}`);
+    console.log(`taskButtonHandler(): DELETE BUTTON Task #${taskId}`);
+    //pass the ID to the deleteTask() function
     deleteTask(taskId);
-
   } 
-  // else if (event.target.matches(".edit-btn")) {
-  //   console.log('You clicked an Edit button!')
-  // }
-}
+};
 
-//function to delete a task that takes taskId parameter form taskButtonHandler()
+
+// EDIT a task - takes taskId parameter form taskButtonHandler()
+var editTask = function(taskId) {
+
+  var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+  //get task name and task type info
+  var taskName = taskSelected.querySelector("h3.task-name").textContent;
+  console.log(taskName);
+  document.querySelector(`input[name="task-name"]`).value = taskName;
+  var taskType = taskSelected.querySelector("span.task-type").textContent;
+  console.log(taskType);
+  document.querySelector(`select[name="task-type"]`).value = taskType;
+
+  //change the text on the ADD button 
+  document.querySelector("#save-task").textContent = "Save Changes";
+
+  //assign the ID from the edited task to the form
+  formEl.setAttribute("data-task-id", taskId);
+};
+
+
+//function for finishing editing a task that gets called if the FOR element has been assigned a data-task-id attribute
+var completeTaskEdit = function(taskName, taskType, taskId) {
+  console.log(`completeTaskEdit() - name: ${taskName}, type: ${taskType}, id: ${taskId}`);
+
+  var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+
+  //set new values
+  taskSelected.querySelector("h3.task-name").textContent = taskName;
+  taskSelected.querySelector("span.task-type").textContent = taskType;
+
+  alert("Task updated!")
+  formEl.removeAttribute("data-task-id");
+  document.querySelector("#save-task").textContent = "Add Task";
+};
+
+
+// DELETE a task - takes taskId parameter form taskButtonHandler()
 var deleteTask = function(taskId) {
-  console.log(`taskButtonHandler() >> passed  deleteTask() the ID ${taskId}`);
 
-  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
   taskSelected.remove();
 }
 
+
+// click event listener
 pageContentEl.addEventListener('click', taskButtonHandler)
