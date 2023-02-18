@@ -1,6 +1,8 @@
 var pageContentEl = document.querySelector("#page-content");
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector('#tasks-to-do');
+var tasksInProgressEl = document.querySelector("#tasks-in-progress");
+var tasksCompletedEl = document.querySelector("#tasks-completed"); 
 // start a variable that holds a unique id number for each task
 var taskIdCounter = 0;
 
@@ -184,5 +186,36 @@ var deleteTask = function(taskId) {
 }
 
 
-// click event listener
+// CHANGE status of the task
+var taskStatusChangeHandler = function(event){
+
+  // //get the task item's id
+  var taskId = event.target.getAttribute("data-task-id");
+  console.log("Task changing status is:" + taskId)
+
+  //get currert selected option's value and convert to lowercase
+  var statusValue = event.target.value.toLowerCase();
+  console.log("Task changing status to:" + statusValue)
+
+  //find the parent task item element based on the id
+  var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`)
+  console.log("taskSelected: " + taskSelected)
+
+  // //change the task to the list correnpondig to the status
+  if (statusValue === "to do") {
+    tasksToDoEl.appendChild(taskSelected);
+  } 
+  else if (statusValue === "in progress") {
+    tasksInProgressEl.appendChild(taskSelected);
+  } 
+  else if (statusValue === "completed") {
+    tasksCompletedEl.appendChild(taskSelected);
+  }
+};
+
+
+// listens for anu clicks on the <main> portion of the document
 pageContentEl.addEventListener('click', taskButtonHandler)
+
+// listens for any changes on the <main> portion of the document
+pageContentEl.addEventListener("change", taskStatusChangeHandler)
