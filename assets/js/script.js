@@ -73,6 +73,7 @@ var createTaskEl = function(taskDataObj){
 
   //increase the counter for a new unique id
   taskIdCounter++;
+  saveTasks()
 };
 
 
@@ -186,6 +187,8 @@ var completeTaskEdit = function(taskName, taskType, taskId) {
     }
   };
 
+  saveTasks() //saves changes to local storage
+
   alert("Task updated!")
   formEl.removeAttribute("data-task-id");
   document.querySelector("#save-task").textContent = "Add Task";
@@ -211,6 +214,9 @@ var deleteTask = function(taskId) {
 
   // reassign tasks array to be the same as updatedTaskArr
   tasks = updatedTaskArr;
+
+  //saves changes to local storage
+  saveTasks() 
 }
 
 
@@ -245,7 +251,18 @@ var taskStatusChangeHandler = function(event){
       tasks[i].status = statusValue;
     }
   }
+
+  saveTasks() //saves changes to local storage
 };
+
+
+// function for SAVING tasks to localStorage
+var saveTasks = function() {
+  // this way the data would be stored as an [object Object]
+  // localStorage.setItem("tasks", tasks);
+
+  localStorage.setItem("tasks", JSON.stringify(tasks))
+}
 
 
 // listens for anu clicks on the <main> portion of the document
