@@ -26,7 +26,7 @@ var taskFormHandler = function(event){
 
   //if data-task-id attribute has been added ot the form, it means you are editing a task
   var isEdit = formEl.hasAttribute("data-task-id");
-  console.log(`editing a task? - ${isEdit}`)
+  //console.log(`editing a task? - ${isEdit}`)
 
   if (isEdit) {
     var taskId = formEl.getAttribute("data-task-id");
@@ -128,21 +128,21 @@ formEl.addEventListener('submit', taskFormHandler);
 //function to get the individual ID form the button clicked
 var taskButtonHandler = function(event){
   //which element was clicked and triggered the event?
-  console.log(event.target);
+  //console.log(event.target);
 
   var targetEL = event.target;
 
   // EDIT button is clicked
   if (targetEL.matches(".edit-btn")) {
     var taskId = targetEL.getAttribute("data-task-id");
-    console.log(`taskButtonHandler(): EDIT BUTTON Task #${taskId}`);
+    //console.log(`taskButtonHandler(): EDIT BUTTON Task #${taskId}`);
     //pass the ID to the editTask() function
     editTask(taskId);
   }
   //DELETE button is clicked
   else if (targetEL.matches(".delete-btn")) {
     var taskId = event.target.getAttribute("data-task-id");
-    console.log(`taskButtonHandler(): DELETE BUTTON Task #${taskId}`);
+    //console.log(`taskButtonHandler(): DELETE BUTTON Task #${taskId}`);
     //pass the ID to the deleteTask() function
     deleteTask(taskId);
   } 
@@ -155,10 +155,10 @@ var editTask = function(taskId) {
   var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
   //get task name and task type info
   var taskName = taskSelected.querySelector("h3.task-name").textContent;
-  console.log(taskName);
+  //console.log(taskName);
   document.querySelector(`input[name="task-name"]`).value = taskName;
   var taskType = taskSelected.querySelector("span.task-type").textContent;
-  console.log(taskType);
+  //console.log(taskType);
   document.querySelector(`select[name="task-type"]`).value = taskType;
 
   //change the text on the ADD button 
@@ -171,7 +171,7 @@ var editTask = function(taskId) {
 
 //function for finishing editing a task that gets called if the FOR element has been assigned a data-task-id attribute
 var completeTaskEdit = function(taskName, taskType, taskId) {
-  console.log(`completeTaskEdit() - name: ${taskName}, type: ${taskType}, id: ${taskId}`);
+  //console.log(`completeTaskEdit() - name: ${taskName}, type: ${taskType}, id: ${taskId}`);
 
   var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
 
@@ -224,15 +224,15 @@ var deleteTask = function(taskId) {
 var taskStatusChangeHandler = function(event){
   //get the task item's id
   var taskId = event.target.getAttribute("data-task-id");
-  console.log("Task changing status is:" + taskId)
+  //console.log("Task changing status is:" + taskId)
 
   //get currert selected option's value and convert to lowercase
   var statusValue = event.target.value.toLowerCase();
-  console.log("Task changing status to:" + statusValue)
+  //console.log("Task changing status to:" + statusValue)
 
   //find the parent task item element based on the id
   var taskSelected = document.querySelector(`.task-item[data-task-id="${taskId}"]`)
-  console.log("taskSelected: " + taskSelected)
+  //console.log("taskSelected: " + taskSelected)
 
   // //change the task to the list correnpondig to the status
   if (statusValue === "to do") {
@@ -265,8 +265,67 @@ var saveTasks = function() {
 }
 
 
-// listens for anu clicks on the <main> portion of the document
+// LOAD previosuly saved tasks
+var loadTasks = function() {
+  //Gets task items from localStorage.
+  tasks = localStorage.getItem("tasks")
+
+  //if the tasks value is null (there ar eno saved tasks) return a false to stop running this function
+  if (tasks === null) {
+      tasks = [];
+      return false
+  }
+
+  //Converts tasks from the string format back into an array of objects.
+  tasks = JSON.parse(tasks);
+
+  //Iterates through a tasks array and creates task elements on the page from it.
+  for (let i = 0; i < tasks.length; i++) {
+    // keep the id for each task in sync
+    tasks[i].id = taskIdCounter;
+
+    //create a list element <li> for each task
+    var listItemEl = document.createElement("li");
+    listItemEl.className = "task-item";
+    listItemEl.setAttribute("data-task-id", tasks[i].id);
+
+    // create a div element <div> to contain all the information of each task
+    var taskInfoEl = document.createElement("div");
+    taskInfoEl.className = "task-info";
+    taskInfoEl.innerHTML = "<h3 class='task-name'>"+ tasks[i].name +"</h3><span class='task-type'>"+ tasks[i].type +"</span>"; 
+
+    //create the actions for the task using the function createTaskActions()
+    var taskActionsEl = createTaskActions(tasks[i].id); 
+
+    listItemEl.appendChild(taskInfoEl)
+    listItemEl.appendChild(taskActionsEl);
+
+    // With an if statement, check if the value of tasks[i].status is equal to to do, in progress or completed. so append to that list
+    if (tasks[i].status === "to do") {
+      listItemEl.querySelector("select[name='status-change']").selectedIndex = 0;
+      tasksToDoEl.appendChild(listItemEl);
+    }
+    else if (tasks[i].status === "in progress") {
+      listItemEl.querySelector("select[name='status-change']").selectedIndex = 1;
+      tasksInProgressEl.appendChild(listItemEl)
+    }
+    else if (tasks[i].status === "completed") {
+      listItemEl.querySelector("select[name='status-change']").selectedIndex = 2;
+      tasksCompletedEl.appendChild(listItemEl)
+    }
+
+    taskIdCounter ++
+  }
+
+  
+}
+
+
+// listens for any clicks on the <main> portion of the document
 pageContentEl.addEventListener('click', taskButtonHandler)
 
 // listens for any changes on the <main> portion of the document
 pageContentEl.addEventListener("change", taskStatusChangeHandler)
+
+//load all previously saved task onto the page
+loadTasks()
